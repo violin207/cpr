@@ -54,6 +54,12 @@ def handle_operator_and_punctutation(f: TextIOWrapper, start: str) -> Token:
     elif (start == '-' and char == '-'):
         str_value += char
         char = f.read(1)
+    elif (start == '&' and char == '&'):
+        str_value += char
+        char = f.read(1)
+    elif (start == '|' and char == '|'):
+        str_value += char
+        char = f.read(1)
 
     if (Operator.is_operator(str_value)):
         return Operator(str_value), char
