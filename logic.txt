@@ -1,0 +1,63 @@
+0: Identifier
+
+1: Integer
+*Do not recoginze '-9' or '+9' as one integer.
+
+2: String
+*String can either indicated by '' or "".
+
+3: Float
+*Accept 1. or 1.2 or 12.34 or 12., but do not accept .123
+
+
+Keywords:
+11: int
+12: main
+13: char
+14: for
+15: if
+16: else
+17: return
+18: float
+
+Operator
+101: =
+102: ==
+103: >=
+104: <=
+105: >
+106: <
+107: +
+108: -
+109: *
+110: /
+111: ++
+112: --
+
+Puncutation:
+201: {
+202: }
+203: ,
+204: ;
+205: (
+206: )
+207: [
+208: ]
+
+
+The overall logic is iterating the file descriptor,
+if meet space or next line character, skip it.
+if meet digit, start to read more and check integer or float.
+if meet alpha or '_', start to read more check keyword or identifier.
+if meet ' or ", start to read it as a string, and capture the ending.
+else: check if it meets operator or punctuation
+
+
+
+For special example:
+Input:
+int i = 0;
+i+++++++;
+
+Output:
+<'int', keyword>, <'i', identifier>, <'=', operator>, <'0', int>, <';', punctuation>, <'i', identifier>, <'++', operator>, <'++', operator>, <'++', operator>, <'+', operator>, <';', punctuation>

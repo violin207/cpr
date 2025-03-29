@@ -1,0 +1,4 @@
+string a = 'abc', b = "This is a string ' and ' this is still a string", c = 'Try sth else " with " and see', d = 'Trying escape \', \", \n, \\';
+string first = '\\', second = '\'';
+string f1 = "\\", f2 = "\"", f3 = "\'";
+string _name_underscore = '';
