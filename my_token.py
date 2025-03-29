@@ -78,7 +78,10 @@ class Keyword(Token):
         'if': 15,
         'else': 16,
         'return': 17,
-        'float': 18
+        'float': 18,
+        'and': 19,
+        'or': 20,
+        'not': 21
     }
 
     token_type = 'keyword'
