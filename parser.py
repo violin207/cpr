@@ -18,6 +18,9 @@ class STATE(Enum):
 class Parser():
     OP1 = [Operator.OPERATOR_DICT[x] for x in ['+', '-']]
     OP2 = [Operator.OPERATOR_DICT[x] for x in ['*', '/']]
+    OP_OR = [Operator.OPERATOR_DICT['||'], Keyword.KEYWORD_DICT['or']]
+    OP_AND = [Operator.OPERATOR_DICT['&&'], Keyword.KEYWORD_DICT['and']]
+    OP_NOT = [Operator.OPERATOR_DICT['!'], Keyword.KEYWORD_DICT['not']]
 
     def __init__(self, pt: int, token_list: list[Token]):
         self.pt = pt
@@ -35,9 +38,7 @@ class Parser():
         if (self.pt >= len(self.token_list)):
             return False
 
-        ret = any(
-            self.token_list[self.pt].token_value == op
-            for op in op_list)
+        ret = any(self.token_list[self.pt].token_value == op for op in op_list)
         self.pt += 1
         return ret
 
@@ -66,7 +67,7 @@ class Parser():
 
     def LOGIC_EP_(self) -> bool:
         tmp = self.pt
-        if (self.match(Keyword.KEYWORD_DICT['or']) and self.LOGIC_EP_B()
+        if (self.match_op(self.OP_OR) and self.LOGIC_EP_B()
                 and self.LOGIC_EP_()):
             return True
 
@@ -83,7 +84,7 @@ class Parser():
 
     def LOGIC_EP_B_(self) -> bool:
         tmp = self.pt
-        if (self.match(Keyword.KEYWORD_DICT['and']) and self.LOGIC_EP_C()
+        if (self.match_op(self.OP_AND) and self.LOGIC_EP_C()
                 and self.LOGIC_EP_B_()):
             return True
 
@@ -92,7 +93,7 @@ class Parser():
 
     def LOGIC_EP_C(self) -> bool:
         tmp = self.pt
-        if (self.match(Keyword.KEYWORD_DICT['not']) and self.LOGIC_EP_C()):
+        if (self.match_op(self.OP_NOT) and self.LOGIC_EP_C()):
             return True
 
         self.pt = tmp
@@ -121,7 +122,7 @@ class Parser():
             return True
 
         self.pt = tmp
-        if (self.MATH_EP() and self.match(Operator.OPERATOR_DICT['>'])
+        if (self.MATH_EP() and self.match(Operator.OPERATOR_DICT['<'])
                 and self.MATH_EP()):
             return True
 
