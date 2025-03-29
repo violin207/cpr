@@ -24,11 +24,17 @@ class Parser():
         self.token_list = token_list
 
     def match(self, type: int) -> bool:
+        if (self.pt >= len(self.token_list)):
+            return False
+        
         ret = self.token_list[self.pt].token_value == type
         self.pt += 1
         return ret
 
     def match_op(self, op_list: list[str]) -> bool:
+        if (self.pt >= len(self.token_list)):
+            return False
+        
         ret = any(
             self.token_list[self.pt].token_value == Operator.OPERATOR_DICT[op]
             for op in op_list)
@@ -86,10 +92,6 @@ class Parser():
 
     def TERM(self) -> bool:
         tmp = self.pt
-        if (self.MATH_EP()):
-            return True
-
-        self.pt = tmp
         if (self.match(Identifier.token_value)):
             return True
         
@@ -100,6 +102,10 @@ class Parser():
         self.pt = tmp
         if (self.match(Float.token_value)):
             return True
+        
+        self.pt = tmp
+        if (self.match(Punctuation.PUNCTUATION_DICT['(']) and self.MATH_EP() and self.match(Punctuation.PUNCTUATION_DICT[')'])):
+            return True
 
         self.pt = tmp
         return False
@@ -107,15 +113,17 @@ class Parser():
 
 if __name__ == '__main__':
     tokens = read_tokens_from_file('output.txt')
-    current_stat = STATE.START
-    idx = 0
-    tokens_size = len(tokens)
+    parser = Parser(0, tokens)
+    print(parser.EP(), parser.pt, parser.token_list[parser.pt])
+    # current_stat = STATE.START
+    # idx = 0
+    # tokens_size = len(tokens)
 
-    while (idx < tokens_size - 1):
-        token = tokens[idx]
-        if (current_stat == STATE.START):
-            if (type(token) is not Keyword):
-                raise Exception(token)
-            if (not token.is_type()):
-                raise Exception(token)
-        pass
+    # while (idx < tokens_size - 1):
+    #     token = tokens[idx]
+    #     if (current_stat == STATE.START):
+    #         if (type(token) is not Keyword):
+    #             raise Exception(token)
+    #         if (not token.is_type()):
+    #             raise Exception(token)
+    #     pass
