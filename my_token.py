@@ -37,28 +37,29 @@ class Token:
 
 
 class Identifier(Token):
+    token_type = 'identifier'
+    token_value = 0
     def __init__(self, str_value: str):
         self.token_str = str_value
-        self.token_type = 'identifier'
-        self.token_value = 0
 
 class Integer(Token):
+    token_type = 'int'
+    token_value = 1
     def __init__(self, str_value: str):
         self.token_str = str_value
-        self.token_type = 'int'
-        self.token_value = 1
 
 class String(Token):
+    token_type = 'str'
+    token_value = 2
     def __init__(self, str_value: str):
         self.token_str = str_value
-        self.token_type = 'str'
-        self.token_value = 2
 
 class Float(Token):
+    token_type = 'float'
+    token_value = 3
+
     def __init__(self, str_value: str):
         self.token_str = str_value
-        self.token_type = 'float'
-        self.token_value = 3
 
 class Keyword(Token):
     KEYWORD_DICT = {
@@ -72,9 +73,10 @@ class Keyword(Token):
         'float': 18
     }
 
+    token_type = 'keyword'
+
     def __init__(self, str_value: str):
         self.token_str = str_value
-        self.token_type = 'keyword'
         self.token_value = Keyword.KEYWORD_DICT[self.token_str]
 
     @staticmethod
@@ -101,9 +103,9 @@ class Operator(Token):
         '++': 111,
         '--': 112
     }
+    token_type = 'operator'
     def __init__(self, str_value: str):
         self.token_str = str_value
-        self.token_type = 'operator'
         self.token_value = Operator.OPERATOR_DICT[self.token_str]
 
     @staticmethod
@@ -121,9 +123,11 @@ class Punctuation(Token):
         '[': 207,
         ']': 208
     }
+    
+    token_type = 'punctuation'
+
     def __init__(self, str_value: str):
         self.token_str = str_value
-        self.token_type = 'punctuation'
         self.token_value = Punctuation.PUNCTUATION_DICT[self.token_str]
 
     @staticmethod
