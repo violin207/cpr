@@ -1,5 +1,6 @@
 import re
 
+
 class Token:
     token_str: str
     token_type: str
@@ -7,7 +8,7 @@ class Token:
 
     def __str__(self):
         return f"<'{self.token_str}', {self.token_type}>"
-    
+
     @staticmethod
     def from_string(token_str: str):
         """Parse a token string in the format <'value', type> and return the appropriate Token object"""
@@ -15,9 +16,9 @@ class Token:
         match = re.match(r"<'(.*)', (.*)>", token_str.strip())
         if not match:
             raise ValueError(f"Invalid token format: {token_str}")
-        
+
         str_value, token_type = match.groups()
-        
+
         if token_type == 'identifier':
             return Identifier(str_value)
         elif token_type == 'int':
@@ -39,20 +40,26 @@ class Token:
 class Identifier(Token):
     token_type = 'identifier'
     token_value = 0
+
     def __init__(self, str_value: str):
         self.token_str = str_value
+
 
 class Integer(Token):
     token_type = 'int'
     token_value = 1
+
     def __init__(self, str_value: str):
         self.token_str = str_value
+
 
 class String(Token):
     token_type = 'str'
     token_value = 2
+
     def __init__(self, str_value: str):
         self.token_str = str_value
+
 
 class Float(Token):
     token_type = 'float'
@@ -60,6 +67,7 @@ class Float(Token):
 
     def __init__(self, str_value: str):
         self.token_str = str_value
+
 
 class Keyword(Token):
     KEYWORD_DICT = {
@@ -88,6 +96,7 @@ class Keyword(Token):
             return True
         return False
 
+
 class Operator(Token):
     OPERATOR_DICT = {
         '=': 101,
@@ -104,6 +113,7 @@ class Operator(Token):
         '--': 112
     }
     token_type = 'operator'
+
     def __init__(self, str_value: str):
         self.token_str = str_value
         self.token_value = Operator.OPERATOR_DICT[self.token_str]
@@ -111,6 +121,7 @@ class Operator(Token):
     @staticmethod
     def is_operator(str_value: str) -> bool:
         return str_value in Operator.OPERATOR_DICT
+
 
 class Punctuation(Token):
     PUNCTUATION_DICT = {
@@ -123,7 +134,7 @@ class Punctuation(Token):
         '[': 207,
         ']': 208
     }
-    
+
     token_type = 'punctuation'
 
     def __init__(self, str_value: str):
@@ -134,14 +145,15 @@ class Punctuation(Token):
     def is_punctutaion(str_value: str) -> bool:
         return str_value in Punctuation.PUNCTUATION_DICT
 
+
 def read_tokens_from_file(filename) -> list[Token]:
     with open(filename, 'r') as f:
         content = f.read().strip()
-    
+
     # This regex matches each token while handling commas inside strings
     token_pattern = re.compile(r'''<'(.*?)',\s*(\w+)>''')
     tokens = []
-    
+
     # Find all matches in the content
     for match in token_pattern.finditer(content):
         try:
@@ -149,5 +161,5 @@ def read_tokens_from_file(filename) -> list[Token]:
             tokens.append(token)
         except ValueError as e:
             print(f"Warning: Could not parse token '{match.group(0)}': {e}")
-    
+
     return tokens

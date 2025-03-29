@@ -3,10 +3,11 @@ from io import TextIOWrapper
 import sys
 import argparse
 
+
 def handle_digit(f: TextIOWrapper, start: str) -> Token:
     str_value = start
     is_float = False
-    while (char:= f.read(1)):
+    while (char := f.read(1)):
         if (char.isdigit()):
             str_value += char
         elif (char == '.' and is_float == False):
@@ -19,9 +20,10 @@ def handle_digit(f: TextIOWrapper, start: str) -> Token:
         return Float(str_value), char
     return Integer(str_value), char
 
+
 def handle_identifier_and_keyword(f: TextIOWrapper, start: str) -> Token:
     str_value = start
-    while (char:= f.read(1)):
+    while (char := f.read(1)):
         if (char.isalpha() or char.isdigit() or char == '_'):
             str_value += char
         else:
@@ -32,10 +34,10 @@ def handle_identifier_and_keyword(f: TextIOWrapper, start: str) -> Token:
     else:
         return Identifier(str_value), char
 
+
 def handle_operator_and_punctutation(f: TextIOWrapper, start: str) -> Token:
     str_value = start
-    char= f.read(1)
-
+    char = f.read(1)
 
     if (start == '=' and char == '='):
         str_value += char
@@ -60,11 +62,12 @@ def handle_operator_and_punctutation(f: TextIOWrapper, start: str) -> Token:
     else:
         raise Exception(str_value)
 
+
 def handle_string(f: TextIOWrapper, start: str):
     str_value = start
     ending_op = start
     finished = False
-    while (char:= f.read(1)):
+    while (char := f.read(1)):
         if (char == '\\'):
             char += f.read(1)
 
@@ -73,11 +76,12 @@ def handle_string(f: TextIOWrapper, start: str):
             finished = True
             char = f.read(1)
             break
-    
+
     if finished:
         return String(str_value), char
     else:
         raise Exception('Error when handling string.')
+
 
 def parse(s):
     parser = argparse.ArgumentParser(s)
@@ -87,11 +91,12 @@ def parse(s):
     parsed_args = parser.parse_args()
     return parsed_args.input_file, parsed_args.output_file
 
+
 if __name__ == '__main__':
     input_filename, output_filename = parse(sys.argv[0])
 
     with open(input_filename, 'r') as f:
-        tokens : list[Token] = list()        
+        tokens: list[Token] = list()
 
         char = f.read(1)
         while (char != ''):
@@ -109,6 +114,6 @@ if __name__ == '__main__':
             else:
                 token, char = handle_operator_and_punctutation(f, char)
                 tokens.append(token)
-            
+
     with open(output_filename, 'w') as f:
         f.write(', '.join(map(str, tokens)))
