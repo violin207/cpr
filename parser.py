@@ -16,8 +16,8 @@ class STATE(Enum):
 
 
 class Parser():
-    OP1 = ['+', '-']
-    OP2 = ['*', '/']
+    OP1 = [Operator.OPERATOR_DICT[x] for x in ['+', '-']]
+    OP2 = [Operator.OPERATOR_DICT[x] for x in ['*', '/']]
 
     def __init__(self, pt: int, token_list: list[Token]):
         self.pt = pt
@@ -31,12 +31,12 @@ class Parser():
         self.pt += 1
         return ret
 
-    def match_op(self, op_list: list[str]) -> bool:
+    def match_op(self, op_list: list[int]) -> bool:
         if (self.pt >= len(self.token_list)):
             return False
 
         ret = any(
-            self.token_list[self.pt].token_value == Operator.OPERATOR_DICT[op]
+            self.token_list[self.pt].token_value == op
             for op in op_list)
         self.pt += 1
         return ret
