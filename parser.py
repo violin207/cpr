@@ -26,7 +26,7 @@ class Parser():
     def match(self, type: int) -> bool:
         if (self.pt >= len(self.token_list)):
             return False
-        
+
         ret = self.token_list[self.pt].token_value == type
         self.pt += 1
         return ret
@@ -34,7 +34,7 @@ class Parser():
     def match_op(self, op_list: list[str]) -> bool:
         if (self.pt >= len(self.token_list)):
             return False
-        
+
         ret = any(
             self.token_list[self.pt].token_value == Operator.OPERATOR_DICT[op]
             for op in op_list)
@@ -94,17 +94,18 @@ class Parser():
         tmp = self.pt
         if (self.match(Identifier.token_value)):
             return True
-        
+
         self.pt = tmp
         if (self.match(Integer.token_value)):
             return True
-        
+
         self.pt = tmp
         if (self.match(Float.token_value)):
             return True
-        
+
         self.pt = tmp
-        if (self.match(Punctuation.PUNCTUATION_DICT['(']) and self.MATH_EP() and self.match(Punctuation.PUNCTUATION_DICT[')'])):
+        if (self.match(Punctuation.PUNCTUATION_DICT['(']) and self.MATH_EP()
+                and self.match(Punctuation.PUNCTUATION_DICT[')'])):
             return True
 
         self.pt = tmp
