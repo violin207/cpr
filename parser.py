@@ -57,7 +57,79 @@ class Parser():
         return False
 
     def LOGIC_EP(self) -> bool:
-        # TODO
+        tmp = self.pt
+        if (self.LOGIC_EP_B() and self.LOGIC_EP_):
+            return True
+
+        self.pt = tmp
+        return False
+
+    def LOGIC_EP_(self) -> bool:
+        tmp = self.pt
+        if (self.match(Keyword.KEYWORD_DICT['or']) and self.LOGIC_EP_B()
+                and self.LOGIC_EP_()):
+            return True
+
+        self.pt = tmp
+        return True
+
+    def LOGIC_EP_B(self) -> bool:
+        tmp = self.pt
+        if (self.LOGIC_EP_C() and self.LOGIC_EP_B_()):
+            return True
+
+        self.pt = tmp
+        return False
+
+    def LOGIC_EP_B_(self) -> bool:
+        tmp = self.pt
+        if (self.match(Keyword.KEYWORD_DICT['and']) and self.LOGIC_EP_C()
+                and self.LOGIC_EP_B_()):
+            return True
+
+        self.pt = tmp
+        return True
+
+    def LOGIC_EP_C(self) -> bool:
+        tmp = self.pt
+        if (self.match(Keyword.KEYWORD_DICT['not']) and self.LOGIC_EP_C()):
+            return True
+
+        self.pt = tmp
+        if (self.LOGIC_EP_D()):
+            return True
+
+        return False
+
+    def LOGIC_EP_D(self) -> bool:
+        tmp = self.pt
+        if (self.match(Punctuation.PUNCTUATION_DICT['(']) and self.LOGIC_EP()
+                and self.match(Punctuation.PUNCTUATION_DICT[')'])):
+            return True
+
+        self.pt = tmp
+        if (self.LOGIC_EP_E()):
+            return True
+
+        self.pt = tmp
+        return False
+
+    def LOGIC_EP_E(self) -> bool:
+        tmp = self.pt
+        if (self.MATH_EP() and self.match(Operator.OPERATOR_DICT['>'])
+                and self.MATH_EP()):
+            return True
+
+        self.pt = tmp
+        if (self.MATH_EP() and self.match(Operator.OPERATOR_DICT['>'])
+                and self.MATH_EP()):
+            return True
+
+        self.pt = tmp
+        if (self.MATH_EP()):
+            return True
+
+        self.pt = tmp
         return False
 
     def MATH_EP(self) -> bool:
