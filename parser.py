@@ -27,18 +27,20 @@ class Parser():
         self.token_list = token_list
 
     def match(self, type: int) -> bool:
-        if (self.pt >= len(self.token_list)):
+        if (self.is_end()):
             return False
 
-        ret = self.token_list[self.pt].token_value == type
+        cur = self.cur()
+        ret = cur.token_value == type
         self.pt += 1
         return ret
 
     def match_op(self, op_list: list[int]) -> bool:
-        if (self.pt >= len(self.token_list)):
+        if (self.is_end()):
             return False
-
-        ret = any(self.token_list[self.pt].token_value == op for op in op_list)
+        
+        cur = self.cur()
+        ret = any(cur.token_value == op for op in op_list)
         self.pt += 1
         return ret
 
@@ -183,6 +185,118 @@ class Parser():
 
         self.pt = tmp
         return False
+
+    # Another approach starts here
+    """
+    DECLA → TYPE VAR_LIST ;
+    VAR_LIST → VAR VAR_LIST'
+    VAR_LIST' → , VAR VAR_LIST' | ɛ
+    VAR → id VAR'
+    VAR' → INITIAL | [ intc ]
+    INITIAL → = EP | ɛ
+    """
+
+    def DECLA(self) -> bool:
+        if (self.is_end()):
+            return False
+        else:
+            cur = self.cur()
+            if (isinstance(cur, Keyword) and cur.is_type()):
+                assert (self.TYPE() and self.VAR_LIST()
+                        and self.match(str_to_token_value(';')))
+                return True
+
+        return False
+
+    def VAR_LIST(self) -> bool:
+        if (self.is_end()):
+            return False
+        else:
+            cur = self.cur()
+            if (cur.token_value == Identifier.token_value):
+                assert (self.VAR() and self.VAR_LIST_())
+                return True
+        return False
+
+    def VAR_LIST_(self) -> bool:
+        if (self.is_end()):
+            return False
+        else:
+            cur = self.cur()
+            if (cur.token_value == str_to_token_value(',')):
+                assert (self.match(str_to_token_value(',')) and self.VAR()
+                        and self.VAR_LIST_())
+                return True
+            elif (cur.token_value == str_to_token_value(';')):
+                return True
+        return False
+
+    def VAR(self) -> bool:
+        if (self.is_end()):
+            return False
+        else:
+            cur = self.cur()
+            if (cur.token_value == Identifier.token_value):
+                assert (self.match(Identifier.token_value) and self.VAR_())
+                return True
+        return False
+
+    def VAR_(self) -> bool:
+        if (self.is_end()):
+            return False
+        else:
+            cur = self.cur()
+            if (cur.token_value == str_to_token_value(',')):
+                assert self.INITIAL()
+                return True
+            elif (cur.token_value == str_to_token_value(';')):
+                assert self.INITIAL()
+                return True
+            elif (cur.token_value == str_to_token_value('=')):
+                assert self.INITIAL()
+                return True
+            elif (cur.token_value == str_to_token_value('[')):
+                assert (self.match(str_to_token_value('['))
+                        and self.match(Integer.token_value)
+                        and self.match(str_to_token_value(']')))
+                return True
+
+        return False
+
+    def INITIAL(self) -> bool:
+        if (self.is_end()):
+            return False
+        else:
+            cur = self.cur()
+            if (cur.token_value == str_to_token_value(',')):
+                return True
+            elif (cur.token_value == str_to_token_value(';')):
+                return True
+            elif (cur.token_value == str_to_token_value('=')):
+                assert (self.match(str_to_token_value('=')) and self.EP())
+                return True
+
+        return False
+
+    def TYPE(self) -> bool:
+        assert (self.match_type())
+        return True
+
+    def cur(self) -> Token:
+        return self.token_list[self.pt]
+
+    def is_end(self) -> bool:
+        return self.pt >= len(self.token_list)
+
+    def match_type(self):
+        if (self.is_end()):
+            return False
+
+        cur = self.cur()
+        assert isinstance(cur, Keyword)
+        ret = cur.is_type()
+        self.pt += 1
+        return ret
 
 
 if __name__ == '__main__':
