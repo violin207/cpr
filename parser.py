@@ -198,29 +198,32 @@ class Parser():
 
     def DECLA(self) -> bool:
         if (self.is_end()):
-            return False
+            print('Unexpected ending.')
         else:
             cur = self.cur()
             if (isinstance(cur, Keyword) and cur.is_type()):
                 assert (self.TYPE() and self.VAR_LIST()
                         and self.match(str_to_token_value(';')))
                 return True
-
+            print(f'Unexpected {cur.token_str}')
+        print('Expected TYPE')
         return False
 
     def VAR_LIST(self) -> bool:
         if (self.is_end()):
-            return False
+            print('Unexpected ending')
         else:
             cur = self.cur()
             if (cur.token_value == Identifier.token_value):
                 assert (self.VAR() and self.VAR_LIST_())
                 return True
+            print(f'Unexpected {cur.token_str}')
+        print('Expected Identifier')
         return False
 
     def VAR_LIST_(self) -> bool:
         if (self.is_end()):
-            return False
+            print('Unexpected ending')
         else:
             cur = self.cur()
             if (cur.token_value == str_to_token_value(',')):
@@ -229,21 +232,26 @@ class Parser():
                 return True
             elif (cur.token_value == str_to_token_value(';')):
                 return True
+            print(f'Unexpected {cur.token_str}')
+        print('Expected , ;')
         return False
 
     def VAR(self) -> bool:
         if (self.is_end()):
-            return False
+            print('Unexpected ending')
         else:
             cur = self.cur()
             if (cur.token_value == Identifier.token_value):
                 assert (self.match(Identifier.token_value) and self.VAR_())
                 return True
+            print(f'Unexpected {cur.token_str}')
+        
+        print('Expected Identifier')
         return False
 
     def VAR_(self) -> bool:
         if (self.is_end()):
-            return False
+            print('Unexpected ending')
         else:
             cur = self.cur()
             if (cur.token_value == str_to_token_value(',')):
@@ -260,12 +268,14 @@ class Parser():
                         and self.match(Integer.token_value)
                         and self.match(str_to_token_value(']')))
                 return True
+            print(f'Unexpected {cur.token_str}')
 
+        print('Expected either , ; = [')
         return False
 
     def INITIAL(self) -> bool:
         if (self.is_end()):
-            return False
+            print('Unexpected ending')
         else:
             cur = self.cur()
             if (cur.token_value == str_to_token_value(',')):
@@ -275,11 +285,13 @@ class Parser():
             elif (cur.token_value == str_to_token_value('=')):
                 assert (self.match(str_to_token_value('=')) and self.EP())
                 return True
+            print(f'Unexpected {cur.token_str}')
 
+        print('Expected either , ; =')
         return False
 
     def TYPE(self) -> bool:
-        assert (self.match_type())
+        assert (self.match_type()) # It should always pass
         return True
 
     def cur(self) -> Token:
