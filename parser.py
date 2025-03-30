@@ -300,9 +300,10 @@ class Parser():
 
 
 if __name__ == '__main__':
-    tokens = read_tokens_from_file('output.txt')
+    from pathlib import Path
+    tokens = read_tokens_from_file(Path('output', 'output7.txt'))
     parser = Parser(0, tokens)
-    print(parser.EP(), parser.pt, parser.token_list[parser.pt])
+    print(parser.DECLA(), parser.pt)
     # current_stat = STATE.START
     # idx = 0
     # tokens_size = len(tokens)

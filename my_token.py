@@ -158,7 +158,7 @@ def str_to_token_value(s: str):
     elif (Punctuation.is_punctutaion(s)):
         return Punctuation.PUNCTUATION_DICT[s]
     elif (Operator.is_operator(s)):
-        return Operator.is_operator
+        return Operator.OPERATOR_DICT[s]
     else:
         raise Exception(
             f'Unknow value {s}. Cannot be converted to token value')
