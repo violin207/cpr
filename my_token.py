@@ -152,6 +152,18 @@ class Punctuation(Token):
         return str_value in Punctuation.PUNCTUATION_DICT
 
 
+def str_to_token_value(s: str):
+    if (Keyword.is_keyword(s)):
+        return Keyword.KEYWORD_DICT[s]
+    elif (Punctuation.is_punctutaion(s)):
+        return Punctuation.PUNCTUATION_DICT[s]
+    elif (Operator.is_operator(s)):
+        return Operator.is_operator
+    else:
+        raise Exception(
+            f'Unknow value {s}. Cannot be converted to token value')
+
+
 def read_tokens_from_file(filename) -> list[Token]:
     with open(filename, 'r') as f:
         content = f.read().strip()
