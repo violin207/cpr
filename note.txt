@@ -1,0 +1,54 @@
+Recursive descent parse:
+EP -> LOGIC | MATH | str
+MATH -> TD MATH'
+MATH' -> op1 TD MATH' | ɛ
+TD -> TERM TD'
+TD' -> op2 TERM TD' | ɛ
+TERM -> ( MATH ) | id | intc | real
+(op1 = +, -) (op2 = *, /)
+
+LOGIC -> B LOGIC'
+LOGIC' -> or B LOGIC' | ɛ
+B -> C B'
+B' -> and C B' | ɛ
+C -> not C | D
+D -> ( A ) | E
+E -> MATH_EP > MATH_EP | MATH_EP < MATH_EP | MATH_EP
+
+
+
+LL(1) parse:
+DECLA → TYPE VAR_LIST ;
+VAR_LIST → VAR VAR_LIST'
+VAR_LIST' → , VAR VAR_LIST' | ɛ
+VAR → id VAR'
+VAR' → INITIAL | [ intc ]
+INITIAL → = EP | ɛ
+
+
+Non-Terminal | id           | ,              | ;      | =       | [          | intc  | TYPE            | $
+-----------------------------------------------------------------------------------------------------------------
+DECLA        |              |                |        |         |            |       | TYPE VAR_LIST ; | 
+VAR_LIST     | VAR VAR_LIST'|                |        |         |            |       |                 |
+VAR_LIST'    |              | , VAR VAR_LIST'| ε      |         |            |       |                 |
+VAR          | id VAR'      |                |        |         |            |       |                 |
+VAR'         |              | INITIAL        | INITIAL| INITIAL | [ intc ]   |       |                 |
+INITIAL      |              | ε              | ε      | = EP    |            |       |                 |
+
+
+#TODO
+START -> EX_DECLA | START EX_DECLA
+EX_DECLA -> FUNC_DEF | DECLA
+FUNC_DEF -> TYPE id ( ) { BLOCK_ST }
+(Param list)
+
+BLOCK_ST -> STATM | BLOCK_ST STATM
+STATM -> DECLA | ASS_ST | IF_ST | FOR_ST | WHILE_ST | RETURN_ST
+RETURN_ST -> return EP ;
+WHILE_ST -> while ( LOGIC ) { BLOCK_ST }
+ASS_ST -> id = EP ;
+IF_ST -> if ( LOGIC ) { BLOCK_ST } ELSE_ST
+ELSE_ST -> else { BLOCK_ST } | ɛ
+FOR_ST -> for ( VAR ; LOGIC ; ASS_ST ) { BLOCK_ST }
+(Block is necessary for now)
+(DECLA cannot be used in first argument of FOR_ST)
