@@ -1,0 +1,94 @@
+digraph SLR1 {
+  rankdir="LR";
+  node [shape=rectangle];
+
+  /////// STATES ///////
+
+  S0 [label="State 0\n[S -> . BLOCK_ST]\n[BLOCK_ST -> . STATM]\n[BLOCK_ST -> . BLOCK_ST STATM]\n[STATM -> . ASS]\n[STATM -> . WHILE_ST]\n[STATM -> . RETURN_ST]\n[ASS_ST -> . id = EP ;]\n[WHILE_ST -> . while ( LOGIC ) { BLOCK_ST }]\n[RETURN_ST -> . return EP ;]"];
+
+  S1 [label="State 1\n[S -> BLOCK_ST .]\n[BLOCK_ST -> BLOCK_ST . STATM]\n[STATM -> . ASS]\n[STATM -> . WHILE_ST]\n[STATM -> . RETURN_ST]\n[ASS_ST -> . id = EP ;]\n[WHILE_ST -> . while ( LOGIC ) { BLOCK_ST }]\n[RETURN_ST -> . return EP ;]"];
+
+  S2 [label="State 2\n[BLOCK_ST -> STATM .]"];
+
+  S3 [label="State 3\n[ASS_ST -> id . = EP ;]"];
+
+  S4 [label="State 4\n[ASS_ST -> id = . EP ;]"];
+
+  S5 [label="State 5\n[ASS_ST -> id = EP . ;]"];
+
+  S6 [label="State 6\n[ASS_ST -> id = EP ; .]"];
+
+  S7 [label="State 7\n[BLOCK_ST -> BLOCK_ST STATM .]"];
+
+  S8 [label="State 8\n[WHILE_ST -> while . ( LOGIC ) { BLOCK_ST }]"];
+
+  S9 [label="State 9\n[WHILE_ST -> while ( . LOGIC ) { BLOCK_ST }]"];
+
+  S10 [label="State 10\n[WHILE_ST -> while ( LOGIC . ) { BLOCK_ST }]"];
+
+  S11 [label="State 11\n[WHILE_ST -> while ( LOGIC ) . { BLOCK_ST }]"];
+
+  S12 [label="State 12\n[WHILE_ST -> while ( LOGIC ) { . BLOCK_ST }]\n[BLOCK_ST -> . STATM]\n[BLOCK_ST -> . BLOCK_ST STATM]\n[STATM -> . ASS]\n[STATM -> . WHILE_ST]\n[STATM -> . RETURN_ST]\n[ASS_ST -> . id = EP ;]\n[WHILE_ST -> . while ( LOGIC ) { BLOCK_ST }]\n[RETURN_ST -> . return EP ;]"];
+
+  S13 [label="State 13\n[WHILE_ST -> while ( LOGIC ) { BLOCK_ST . }]"];
+
+  S14 [label="State 14\n[WHILE_ST -> while ( LOGIC ) { BLOCK_ST } .]"];
+  
+  S15 [label="State 15\n[RETURN_ST -> return . EP ;]"];
+
+  S16 [label="State 16\n[RETURN_ST -> return EP . ;]"];
+
+  S17 [label="State 17\n[RETURN_ST -> return EP ; .]"];
+
+  /////// TRANSITIONS ///////
+
+  // From State 0
+  S0 -> S1 [label="BLOCK_ST"];
+  S0 -> S2 [label="STATM"];
+  S0 -> S3 [label="id"];
+  S0 -> S8 [label="while"];
+  S0 -> S15 [label="return"];
+
+  // From State 1
+  S1 -> S7 [label="STATM"];
+  S1 -> S3 [label="id"];
+  S1 -> S8 [label="while"];
+  S1 -> S15 [label="return"];
+
+  // From State 3
+  S3 -> S4 [label="="];
+
+  // From State 4
+  S4 -> S5 [label="EP"];
+
+  // From State 5
+  S5 -> S6 [label=";"];
+
+  // From State 8
+  S8 -> S9 [label="("];
+
+  // From State 9
+  S9 -> S10 [label="LOGIC"];
+
+  // From State 10
+  S10 -> S11 [label=")"];
+
+  // From State 11
+  S11 -> S12 [label="{"];
+
+  // From State 12
+  S12 -> S13 [label="BLOCK_ST"];
+  S12 -> S2 [label="STATM"];
+  S12 -> S3 [label="id"];
+  S12 -> S8 [label="while"];
+  S12 -> S15 [label="return"];
+
+  // From State 13
+  S13 -> S14 [label="}"];
+
+  // From State 15
+  S15 -> S16 [label="EP"];
+
+  // From State 16
+  S16 -> S17 [label=";"];
+}

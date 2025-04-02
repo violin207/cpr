@@ -45,15 +45,14 @@ FUNC_DEF -> TYPE id ( ) { BLOCK_ST }
 BLOCK_ST -> . STATM
 BLOCK_ST -> . BLOCK_ST STATM
 STATM -> . ASS
-STATM -> . FOR_ST
 STATM -> . WHILE_ST
 STATM -> . RETURN_ST
 RETURN_ST -> . return EP ;
 WHILE_ST -> . while ( LOGIC ) { BLOCK_ST }
 ASS_ST -> . id = EP ;
-FOR_ST -> . for ( VAR ; LOGIC ; ASS_ST ) { BLOCK_ST }
 
 
-STATM -> DECLA | IF_ST
+STATM -> IF_ST | FOR_ST | DECLA
 IF_ST -> if ( LOGIC ) { BLOCK_ST } ELSE_ST
 ELSE_ST -> else { BLOCK_ST } | ɛ 
+FOR_ST -> for ( VAR ; LOGIC ; ASS_ST ) { BLOCK_ST }
