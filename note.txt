@@ -42,13 +42,18 @@ EX_DECLA -> FUNC_DEF | DECLA
 FUNC_DEF -> TYPE id ( ) { BLOCK_ST }
 (Param list)
 
-BLOCK_ST -> STATM | BLOCK_ST STATM
-STATM -> DECLA | ASS_ST | IF_ST | FOR_ST | WHILE_ST | RETURN_ST
-RETURN_ST -> return EP ;
-WHILE_ST -> while ( LOGIC ) { BLOCK_ST }
-ASS_ST -> id = EP ;
+BLOCK_ST -> . STATM
+BLOCK_ST -> . BLOCK_ST STATM
+STATM -> . ASS
+STATM -> . FOR_ST
+STATM -> . WHILE_ST
+STATM -> . RETURN_ST
+RETURN_ST -> . return EP ;
+WHILE_ST -> . while ( LOGIC ) { BLOCK_ST }
+ASS_ST -> . id = EP ;
+FOR_ST -> . for ( VAR ; LOGIC ; ASS_ST ) { BLOCK_ST }
+
+
+STATM -> DECLA | IF_ST
 IF_ST -> if ( LOGIC ) { BLOCK_ST } ELSE_ST
-ELSE_ST -> else { BLOCK_ST } | ɛ
-FOR_ST -> for ( VAR ; LOGIC ; ASS_ST ) { BLOCK_ST }
-(Block is necessary for now)
-(DECLA cannot be used in first argument of FOR_ST)
+ELSE_ST -> else { BLOCK_ST } | ɛ 
