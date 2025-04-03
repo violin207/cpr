@@ -493,6 +493,8 @@ class Parser():
             return False
         if not self.LOGIC_EP():
             return False
+        if not self.match(str_to_token_value(')')):
+            return False
         if not self.match(str_to_token_value('{')):
             return False
         if not self.BLOCK_ST():
@@ -561,7 +563,13 @@ if __name__ == '__main__':
         tokens = read_tokens_from_file(Path('output', 'output9.txt'))
         parser = Parser(0, tokens)
         print(parser.DECLA())
+        
+    def func4():
+        tokens = read_tokens_from_file(Path('output', 'output10.txt'))
+        parser = Parser(0, tokens)
+        print(parser.BLOCK_ST())
 
     # func1()
-    func2()
+    # func2()
     # func3()
+    func4()

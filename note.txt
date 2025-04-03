@@ -60,3 +60,7 @@ STATM -> IF_ST | FOR_ST | DECLA
 IF_ST -> if ( LOGIC_EP ) { BLOCK_ST } ELSE_ST
 ELSE_ST -> else { BLOCK_ST } | ɛ 
 FOR_ST -> for ( VAR ; LOGIC_EP ; ASS_ST ) { BLOCK_ST }
+
+
+
+Check again the operand, a lot of operand is missing.
