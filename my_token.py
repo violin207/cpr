@@ -81,7 +81,8 @@ class Keyword(Token):
         'float': 18,
         'and': 19,
         'or': 20,
-        'not': 21
+        'not': 21,
+        'while': 22
     }
 
     token_type = 'keyword'

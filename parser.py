@@ -53,7 +53,8 @@ class Parser():
 
         cur = self.cur()
         ret = cur.token_value == type
-        self.pt += 1
+        if (ret):
+            self.pt += 1 # NOTE For simplicity, move the pointer only if matched
         return ret
 
     def match_op(self, op_list: list[int]) -> bool:
@@ -62,7 +63,8 @@ class Parser():
 
         cur = self.cur()
         ret = any(cur.token_value == op for op in op_list)
-        self.pt += 1
+        if (ret):
+            self.pt += 1 # NOTE For simplicity, move the pointer only if matched
         return ret
 
     def EP(self) -> bool:
@@ -428,6 +430,16 @@ class Parser():
             elif (self.stack.top() == 'ASS_ST'): # Reduce STATM -> ASS_ST
                 self.stack.pop()
                 self.stack.push('STATM')
+                
+            elif (self.stack.top() == 'DECLA'): # Reduce STATM -> DECLA
+                self.stack.pop()
+                self.stack.push('STATM')
+            elif (self.stack.top() == 'IF_ST'): # Reduce STATM -> IF_ST
+                self.stack.pop()
+                self.stack.push('STATM')
+            elif (self.stack.top() == 'FOR_ST'): # Reduce STATM -> FOR_ST
+                self.stack.pop()
+                self.stack.push('STATM')
 
             elif (self.stack.top() == 'WHILE_ST'): # Reduce STATM -> WHILE_ST
                 self.stack.pop()
@@ -458,14 +470,19 @@ class Parser():
                 if (isinstance(cur, Keyword) and cur.is_type()):
                     if (not self.DECLA()):
                         return False
-                if (cur.token_value == str_to_token_value('if')):
+                    self.stack.push('DECLA')
+                elif (cur.token_value == str_to_token_value('if')):
                     if (not self.IF_ST()):
                         return False
+                    self.stack.push('IF_ST')
                 elif (cur.token_value == str_to_token_value('for')):
                     if (not self.FOR_ST()):
                         return False
+                    self.stack.push('FOR_ST')
                 else:
                     print('Error happens')
+                    while (not self.stack.is_empty()):
+                        print(self.stack.pop())
                     return False
         return True
 
@@ -530,18 +547,21 @@ class Parser():
 
 if __name__ == '__main__':
     from pathlib import Path
-    tokens = read_tokens_from_file(Path('output', 'output7.txt'))
-    parser = Parser(0, tokens)
-    print(parser.DECLA(), parser.pt)
-    # current_stat = STATE.START
-    # idx = 0
-    # tokens_size = len(tokens)
+    def func1():
+        tokens = read_tokens_from_file(Path('output', 'output7.txt'))
+        parser = Parser(0, tokens)
+        print(parser.DECLA(), parser.pt)
 
-    # while (idx < tokens_size - 1):
-    #     token = tokens[idx]
-    #     if (current_stat == STATE.START):
-    #         if (type(token) is not Keyword):
-    #             raise Exception(token)
-    #         if (not token.is_type()):
-    #             raise Exception(token)
-    #     pass
+    def func2():
+        tokens = read_tokens_from_file(Path('output', 'output8.txt'))
+        parser = Parser(0, tokens)
+        print(parser.BLOCK_ST())
+
+    def func3():
+        tokens = read_tokens_from_file(Path('output', 'output9.txt'))
+        parser = Parser(0, tokens)
+        print(parser.DECLA())
+
+    # func1()
+    func2()
+    # func3()

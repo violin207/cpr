@@ -48,6 +48,9 @@ BLOCK_ST -> . BLOCK_ST STATM
 STATM -> . ASS_ST
 STATM -> . WHILE_ST
 STATM -> . RETURN_ST
+STATM -> . IF_ST
+STATM -> . FOR_ST
+STATM -> . DECLA
 RETURN_ST -> . return EP ;
 WHILE_ST -> . while ( LOGIC_EP ) { BLOCK_ST }
 ASS_ST -> . id = EP ;
