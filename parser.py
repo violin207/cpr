@@ -15,6 +15,26 @@ class STATE(Enum):
     LOGC_EP = 10
 
 
+class ParserStack():
+
+    def __init__(self):
+        self._stack = list()
+
+    def is_empty(self):
+        return len(self._stack) == 0
+
+    def pop(self):
+        return self._stack.pop()
+
+    def top(self):
+        if (self.is_empty()):
+            return False  # Some handling so life is easier on if-condition
+        return self._stack[len(self._stack) - 1]
+
+    def push(self, x):
+        self._stack.append(x)
+
+
 class Parser():
     OP1 = [Operator.OPERATOR_DICT[x] for x in ['+', '-']]
     OP2 = [Operator.OPERATOR_DICT[x] for x in ['*', '/']]
@@ -25,6 +45,7 @@ class Parser():
     def __init__(self, pt: int, token_list: list[Token]):
         self.pt = pt
         self.token_list = token_list
+        self.stack = ParserStack()
 
     def match(self, type: int) -> bool:
         if (self.is_end()):
@@ -38,7 +59,7 @@ class Parser():
     def match_op(self, op_list: list[int]) -> bool:
         if (self.is_end()):
             return False
-        
+
         cur = self.cur()
         ret = any(cur.token_value == op for op in op_list)
         self.pt += 1
@@ -245,7 +266,7 @@ class Parser():
                 assert (self.match(Identifier.token_value) and self.VAR_())
                 return True
             print(f'Unexpected {cur.token_str}')
-        
+
         print('Expected Identifier')
         return False
 
@@ -291,7 +312,7 @@ class Parser():
         return False
 
     def TYPE(self) -> bool:
-        assert (self.match_type()) # It should always pass
+        assert (self.match_type())  # It should always pass
         return True
 
     def cur(self) -> Token:
@@ -309,6 +330,202 @@ class Parser():
         ret = cur.is_type()
         self.pt += 1
         return ret
+
+    def BLOCK_ST(self) -> bool:
+        accept = False
+        while (not accept):
+            if self.match(str_to_token_value('return')):
+                self.stack.push('return')
+
+                if (self.EP()):
+                    self.stack.push('EP')
+                else:
+                    print('Expected: EP')
+                    return False
+                
+                if (self.match(str_to_token_value(';'))):
+                    self.stack.push(';')
+                else:
+                    print('Expected: ;')
+                    return False
+
+            elif self.match(Identifier.token_value):
+                self.stack.push('id')
+                if self.match(str_to_token_value('=')):
+                    self.stack.push('=')
+                else:
+                    print('Expected: =')
+                    return False
+                
+                if self.EP():
+                    self.stack.push('EP')
+                else:
+                    print('Expected: EP')
+                    return False
+                
+                if (self.match(str_to_token_value(';'))):
+                    self.stack.push(';')
+                else:
+                    print('Expected: ;')
+                    return False
+
+            elif self.match(str_to_token_value('while')):
+                self.stack.push('while')
+                
+                if self.match(str_to_token_value('(')):
+                    self.stack.push('(')
+                else:
+                    print('Expected: (')
+                    return False
+                
+                if self.LOGIC_EP():
+                    self.stack.push('LOGIC_EP')
+                else:
+                    print('Expected: LOGIC_EP')
+                    return False
+                
+                if self.match(str_to_token_value(')')):
+                    self.stack.push(')')
+                else:
+                    print('Expected: )')
+                    return False
+                
+                if self.match(str_to_token_value('{')):
+                    self.stack.push('{')
+                else:
+                    print('Expected: {')
+                    return False
+
+                if (self.BLOCK_ST()):
+                    self.stack.push('BLOCK_ST')
+                else:
+                    print('Expected: BLOCK_ST')
+                    return False
+
+                if (self.match(str_to_token_value('}'))):
+                    self.stack.push('}')
+                else:
+                    print('Expected: }')
+                    return False
+
+            elif (self.stack.top() == ';'): # Reduce 'RETURN_ST -> . return EP ;' and 'ASS_ST -> id = EP ;'
+                self.stack.pop()
+                if (self.stack.top() == 'EP'):
+                    self.stack.pop()
+                    if (self.stack.top() == 'return'):
+                        self.stack.pop()
+                        self.stack.push('RETURN_ST')
+                    elif (self.stack.top() == '='):
+                        self.stack.pop()
+                        if (self.stack.top() == 'id'):
+                            self.stack.pop()
+                            self.stack.push('ASS_ST')
+
+            elif (self.stack.top() == 'RETURN_ST'): # Reduce STATM -> RETURN_ST
+                self.stack.pop()
+                self.stack.push('STATM')
+
+            elif (self.stack.top() == 'ASS_ST'): # Reduce STATM -> ASS_ST
+                self.stack.pop()
+                self.stack.push('STATM')
+
+            elif (self.stack.top() == 'WHILE_ST'): # Reduce STATM -> WHILE_ST
+                self.stack.pop()
+                self.stack.push('STATM')
+
+            elif (self.stack.top() == 'STATM'): # Reduce 'BLOCK_ST -> BLOCK_ST STATM' and 'BLOCK_ST -> STATM'
+                self.stack.pop()
+                if (not self.stack.is_empty()
+                        and self.stack.top() == 'BLOCK_ST'):
+                    self.stack.pop()
+                    self.stack.push('BLOCK_ST')
+                else:
+                    self.stack.push('BLOCK_ST')
+
+            elif self.stack.top() == 'BLOCK_ST': # Reduce 'S -> BLOCK_ST
+                self.stack.pop()
+                self.stack.push('S')
+
+            elif (self.stack.top() == 'S'): # Accept
+                self.stack.pop()
+                accept = True
+            else:
+                # Do LL(1) Top-Down here
+                if (self.is_end()):
+                    print('Unexpected ending.')
+                    return False
+                cur = self.cur()
+                if (isinstance(cur, Keyword) and cur.is_type()):
+                    if (not self.DECLA()):
+                        return False
+                if (cur.token_value == str_to_token_value('if')):
+                    if (not self.IF_ST()):
+                        return False
+                elif (cur.token_value == str_to_token_value('for')):
+                    if (not self.FOR_ST()):
+                        return False
+                else:
+                    print('Error happens')
+                    return False
+        return True
+
+    def IF_ST(self) -> bool:
+        if not self.match(str_to_token_value('if')):
+            return False
+        if not self.match(str_to_token_value('(')):
+            return False
+        if not self.LOGIC_EP():
+            return False
+        if not self.match(str_to_token_value('{')):
+            return False
+        if not self.BLOCK_ST():
+            return False
+        if not self.match(str_to_token_value('}')):
+            return False
+        if not self.ELSE_ST():
+            return False
+
+    def ELSE_ST(self) -> bool:
+        if (self.match(str_to_token_value('{'))):
+            if (not self.BLOCK_ST()):
+                return False
+            if (not self.match(str_to_token_value('}'))):
+                return False
+        return True
+
+
+    def FOR_ST(self) -> bool:
+        if not self.match(str_to_token_value('for')):
+            return False
+        if not self.match(str_to_token_value('(')):
+            return False
+        if not self.VAR():
+            return False
+        if not self.match(str_to_token_value(';')):
+            return False
+        if not self.LOGIC_EP():
+            return False
+        if not self.match(str_to_token_value(';')):
+            return False
+        if not self.ASS_ST():
+            return False
+        if not self.match(str_to_token_value(')')):
+            return False
+        if not self.match(str_to_token_value('{')):
+            return False
+        if not self.BLOCK_ST():
+            return False
+        if not self.match(str_to_token_value('}')):
+            return False
+
+    def ASS_ST(self) -> bool:
+        if not self.match(Identifier.token_value):
+            return False
+        if not self.match(str_to_token_value('=')):
+            return False
+        if not self.EP():
+            return False
+
 
 
 if __name__ == '__main__':
