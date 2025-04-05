@@ -8,12 +8,12 @@ TERM -> ( MATH ) | id | intc | real
 (op1 = +, -) (op2 = *, /)
 
 LOGIC -> B LOGIC'
-LOGIC' -> or B LOGIC' | ɛ
+LOGIC' -> OP_OR B LOGIC' | ɛ
 B -> C B'
-B' -> and C B' | ɛ
-C -> not C | D
+B' -> OP_AND C B' | ɛ
+C -> OP_NOT C | D
 D -> ( A ) | E
-E -> MATH_EP > MATH_EP | MATH_EP < MATH_EP | MATH_EP
+E -> MATH_EP > MATH_EP | MATH_EP < MATH_EP | MATH_EP >= MATH_EP | MATH_EP <= MATH_EP | MATH_EP == MATH_EP |  MATH_EP
 
 
 
@@ -52,14 +52,14 @@ STATM -> . IF_ST
 STATM -> . FOR_ST
 STATM -> . DECLA
 RETURN_ST -> . return EP ;
-WHILE_ST -> . while ( LOGIC_EP ) { BLOCK_ST }
+WHILE_ST -> . while ( EP ) { BLOCK_ST }
 ASS_ST -> . id = EP ;
 
 
 STATM -> IF_ST | FOR_ST | DECLA
-IF_ST -> if ( LOGIC_EP ) { BLOCK_ST } ELSE_ST
+IF_ST -> if ( EP ) { BLOCK_ST } ELSE_ST
 ELSE_ST -> else { BLOCK_ST } | ɛ 
-FOR_ST -> for ( VAR ; LOGIC_EP ; ASS_ST ) { BLOCK_ST }
+FOR_ST -> for ( VAR ; EP ; ASS_ST ) { BLOCK_ST }
 
 
 

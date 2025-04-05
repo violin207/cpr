@@ -1,4 +1,4 @@
-from my_token import read_tokens_from_file, Token, Identifier, Integer, String, Float, Operator, Punctuation, Keyword, str_to_token_value
+from my_token import read_tokens_from_file, Token, Identifier, Integer, String, Float, Operator, Punctuation, Keyword, str_to_token_value, EndOfFileToken
 from enum import Enum
 
 
@@ -148,6 +148,21 @@ class Parser():
 
         self.pt = tmp
         if (self.MATH_EP() and self.match(Operator.OPERATOR_DICT['<'])
+                and self.MATH_EP()):
+            return True
+        
+        self.pt = tmp
+        if (self.MATH_EP() and self.match(Operator.OPERATOR_DICT['>='])
+                and self.MATH_EP()):
+            return True
+        
+        self.pt = tmp
+        if (self.MATH_EP() and self.match(Operator.OPERATOR_DICT['<='])
+                and self.MATH_EP()):
+            return True
+        
+        self.pt = tmp
+        if (self.MATH_EP() and self.match(Operator.OPERATOR_DICT['=='])
                 and self.MATH_EP()):
             return True
 
@@ -318,6 +333,8 @@ class Parser():
         return True
 
     def cur(self) -> Token:
+        if (self.is_end()):
+            return EndOfFileToken()
         return self.token_list[self.pt]
 
     def is_end(self) -> bool:
@@ -336,6 +353,7 @@ class Parser():
     def BLOCK_ST(self) -> bool:
         accept = False
         while (not accept):
+            cur = self.cur()
             if self.match(str_to_token_value('return')):
                 self.stack.push('return')
 
@@ -380,10 +398,10 @@ class Parser():
                     print('Expected: (')
                     return False
                 
-                if self.LOGIC_EP():
-                    self.stack.push('LOGIC_EP')
+                if self.EP():
+                    self.stack.push('EP')
                 else:
-                    print('Expected: LOGIC_EP')
+                    print('Expected: EP')
                     return False
                 
                 if self.match(str_to_token_value(')')):
@@ -408,7 +426,20 @@ class Parser():
                     self.stack.push('}')
                 else:
                     print('Expected: }')
+                    return False  
+            # Do LL(1) Top-Down here
+            elif (isinstance(cur, Keyword) and cur.is_type()):
+                if (not self.DECLA()):
                     return False
+                self.stack.push('DECLA')
+            elif (cur.token_value == str_to_token_value('if')):
+                if (not self.IF_ST()):
+                    return False
+                self.stack.push('IF_ST')
+            elif (cur.token_value == str_to_token_value('for')):
+                if (not self.FOR_ST()):
+                    return False
+                self.stack.push('FOR_ST')
 
             elif (self.stack.top() == ';'): # Reduce 'RETURN_ST -> . return EP ;' and 'ASS_ST -> id = EP ;'
                 self.stack.pop()
@@ -462,28 +493,11 @@ class Parser():
                 self.stack.pop()
                 accept = True
             else:
-                # Do LL(1) Top-Down here
-                if (self.is_end()):
-                    print('Unexpected ending.')
-                    return False
-                cur = self.cur()
-                if (isinstance(cur, Keyword) and cur.is_type()):
-                    if (not self.DECLA()):
-                        return False
-                    self.stack.push('DECLA')
-                elif (cur.token_value == str_to_token_value('if')):
-                    if (not self.IF_ST()):
-                        return False
-                    self.stack.push('IF_ST')
-                elif (cur.token_value == str_to_token_value('for')):
-                    if (not self.FOR_ST()):
-                        return False
-                    self.stack.push('FOR_ST')
-                else:
-                    print('Error happens')
-                    while (not self.stack.is_empty()):
-                        print(self.stack.pop())
-                    return False
+                print('Error happens')
+                while (not self.stack.is_empty()):
+                    print(self.stack.pop())
+                return False
+            
         return True
 
     def IF_ST(self) -> bool:
@@ -491,7 +505,7 @@ class Parser():
             return False
         if not self.match(str_to_token_value('(')):
             return False
-        if not self.LOGIC_EP():
+        if not self.EP():
             return False
         if not self.match(str_to_token_value(')')):
             return False
@@ -503,13 +517,19 @@ class Parser():
             return False
         if not self.ELSE_ST():
             return False
+        return True
 
     def ELSE_ST(self) -> bool:
-        if (self.match(str_to_token_value('{'))):
+        if (not self.match(str_to_token_value('else'))):
+            return True
+        else:
+            if (not self.match(str_to_token_value('{'))):
+                return False
             if (not self.BLOCK_ST()):
                 return False
             if (not self.match(str_to_token_value('}'))):
                 return False
+            return True
         return True
 
 
@@ -522,7 +542,7 @@ class Parser():
             return False
         if not self.match(str_to_token_value(';')):
             return False
-        if not self.LOGIC_EP():
+        if not self.EP():
             return False
         if not self.match(str_to_token_value(';')):
             return False
@@ -565,7 +585,7 @@ if __name__ == '__main__':
         print(parser.DECLA())
         
     def func4():
-        tokens = read_tokens_from_file(Path('output', 'output10.txt'))
+        tokens = read_tokens_from_file(Path('output', 'output11.txt'))
         parser = Parser(0, tokens)
         print(parser.BLOCK_ST())
 

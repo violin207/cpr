@@ -152,6 +152,11 @@ class Punctuation(Token):
     def is_punctutaion(str_value: str) -> bool:
         return str_value in Punctuation.PUNCTUATION_DICT
 
+class EndOfFileToken(Token):
+    token_str = ''
+    token_type = ''
+    token_value = -1
+
 
 def str_to_token_value(s: str):
     if (Keyword.is_keyword(s)):
