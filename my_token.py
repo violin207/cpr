@@ -72,7 +72,7 @@ class Float(Token):
 class Keyword(Token):
     KEYWORD_DICT = {
         'int': 11,
-        'main': 12,
+        # 'main': 12,
         'char': 13,
         'for': 14,
         'if': 15,
@@ -151,6 +151,7 @@ class Punctuation(Token):
     @staticmethod
     def is_punctutaion(str_value: str) -> bool:
         return str_value in Punctuation.PUNCTUATION_DICT
+
 
 class EndOfFileToken(Token):
     token_str = ''

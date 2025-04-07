@@ -2,6 +2,7 @@ from my_token import Token, Identifier, Integer, String, Float, Operator, Punctu
 from io import TextIOWrapper
 import sys
 import argparse
+from pathlib import Path
 
 
 def handle_digit(f: TextIOWrapper, start: str) -> Token:
@@ -101,7 +102,7 @@ def parse(s):
 if __name__ == '__main__':
     input_filename, output_filename = parse(sys.argv[0])
 
-    with open(input_filename, 'r') as f:
+    with open(Path('input', input_filename), 'r') as f:
         tokens: list[Token] = list()
 
         char = f.read(1)
@@ -121,5 +122,5 @@ if __name__ == '__main__':
                 token, char = handle_operator_and_punctutation(f, char)
                 tokens.append(token)
 
-    with open(output_filename, 'w') as f:
+    with open(Path('output', output_filename), 'w') as f:
         f.write(', '.join(map(str, tokens)))

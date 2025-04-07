@@ -261,7 +261,7 @@ class Parser():
             return True
 
         self.pt = tmp
-        self.debug_print('id | intc | real | ()')
+        self.debug_print('id | intc | real | (')
 
         return False
 
@@ -408,9 +408,13 @@ class Parser():
             return False
 
         cur = self.cur()
-        assert isinstance(cur, Keyword)
+        if not isinstance(cur, Keyword):
+            return False
+
         ret = cur.is_type()
-        self.pt += 1
+
+        if ret:
+            self.pt += 1
         return ret
 
     def BLOCK_ST(self) -> bool:
@@ -649,6 +653,7 @@ class Parser():
         if not self.match(str_to_token_value('}')):
             self.debug_print('}')
             return False
+        return True
 
     def ASS_ST(self) -> bool:
         if not self.match(Identifier.token_value):
@@ -659,6 +664,53 @@ class Parser():
             return False
         if not self.EP():
             return False
+        return True
+
+    # LAST PART
+    def START(self) -> bool:
+        tmp = self.pt
+        if (self.EX_DECLA() and self.START_()):
+            return True
+
+        self.pt = tmp
+        self.debug_print('EX_DECLA')
+        return False
+
+    def START_(self) -> bool:
+        tmp = self.pt
+        if (self.EX_DECLA() and self.START_()):
+            return True
+
+        self.pt = tmp
+        return True
+
+    def EX_DECLA(self) -> bool:
+        tmp = self.pt
+        if (self.DECLA()):
+            return True
+
+        self.pt = tmp
+        if (self.FUNC_DEF()):
+            return True
+
+        self.pt = tmp
+        self.debug_print('DECLA | FUNC_DEF')
+
+        return False
+
+    def FUNC_DEF(self) -> bool:
+        tmp = self.pt
+        if (self.match_type() and self.match(Identifier.token_value)
+                and self.match(str_to_token_value('('))
+                and self.match(str_to_token_value(')'))
+                and self.match(str_to_token_value('{')) and self.BLOCK_ST()
+                and self.match(str_to_token_value('}'))):
+            return True
+
+        self.pt = tmp
+        self.debug_print('TYPE')
+
+        return False
 
 
 if __name__ == '__main__':
@@ -684,7 +736,9 @@ if __name__ == '__main__':
         parser = Parser(0, tokens)
         print(parser.BLOCK_ST())
 
-    func1()
-    func2()
-    func3()
-    func4()
+    def func5():
+        tokens = read_tokens_from_file(Path('output', 'output.txt'))
+        parser = Parser(0, tokens)
+        print(parser.START())
+
+    func5()

@@ -36,12 +36,6 @@ VAR'         |              | INITIAL        | INITIAL| INITIAL | [ intc ]   |  
 INITIAL      |              | ε              | ε      | = EP    |            |       |                 |
 
 
-#TODO
-START -> EX_DECLA | START EX_DECLA
-EX_DECLA -> FUNC_DEF | DECLA
-FUNC_DEF -> TYPE id ( ) { BLOCK_ST }
-(Param list)
-
 S -> . BLOCK_ST
 BLOCK_ST -> . STATM
 BLOCK_ST -> . BLOCK_ST STATM
@@ -62,5 +56,10 @@ ELSE_ST -> else { BLOCK_ST } | ɛ
 FOR_ST -> for ( VAR ; EP ; ASS_ST ) { BLOCK_ST }
 
 
+
+START → EX_DECLA START'
+START' -> EX_DECLA START' | ɛ 
+EX_DECLA → FUNC_DEF | DECLA 
+FUNC_DEF → TYPE id ( ) { BLOCK_ST }
 
 Check again the operand, a lot of operand is missing.

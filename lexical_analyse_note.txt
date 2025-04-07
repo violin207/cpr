@@ -12,7 +12,7 @@
 
 Keywords:
 11: int
-12: main
+12: main *** Removed as 'main' should be a Identifier
 13: char
 14: for
 15: if
