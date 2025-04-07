@@ -84,7 +84,7 @@ class Keyword(Token):
         'not': 21,
         'while': 22
     }
-
+    REVERTED_DICT = {value: key for key, value in KEYWORD_DICT.items()}
     token_type = 'keyword'
 
     def __init__(self, str_value: str):
@@ -119,6 +119,7 @@ class Operator(Token):
         '||': 114,
         '!': 115
     }
+    REVERTED_DICT = {value: key for key, value in OPERATOR_DICT.items()}
     token_type = 'operator'
 
     def __init__(self, str_value: str):
@@ -141,6 +142,7 @@ class Punctuation(Token):
         '[': 207,
         ']': 208
     }
+    REVERTED_DICT = {value: key for key, value in PUNCTUATION_DICT.items()}
 
     token_type = 'punctuation'
 
@@ -188,3 +190,53 @@ def read_tokens_from_file(filename) -> list[Token]:
             print(f"Warning: Could not parse token '{match.group(0)}': {e}")
 
     return tokens
+
+
+def token_val_to_str(type: int | list[int]) -> str | list[str]:
+    ret = list()
+    if not isinstance(type, list):
+        if type == Identifier.token_value:
+            ret.append('id')
+        elif type == Integer.token_value:
+            ret.append('intc')
+        elif type == String.token_value:
+            ret.append('str')
+        elif type == Float.token_value:
+            ret.append('real')
+        else:
+            # Either Keyword, Operator, Punctuation
+            if type in Keyword.REVERTED_DICT:
+                ret.append(Keyword.REVERTED_DICT[type])
+            elif type in Operator.REVERTED_DICT:
+                ret.append(Operator.REVERTED_DICT[type])
+            elif type in Punctuation.REVERTED_DICT:
+                ret.append(Punctuation.REVERTED_DICT[type])
+            else:
+                print(type)
+                raise Exception('Unknown token value')
+    else:
+        for i in range(len(type)):
+            if type[i] == Identifier.token_value:
+                ret.append('id')
+            elif type[i] == Integer.token_value:
+                ret.append('intc')
+            elif type[i] == String.token_value:
+                ret.append('str')
+            elif type[i] == Float.token_value:
+                ret.append('real')
+            else:
+                # Either Keyword, Operator, Punctuation
+                if type[i] in Keyword.REVERTED_DICT:
+                    ret.append(Keyword.REVERTED_DICT[type[i]])
+                elif type[i] in Operator.REVERTED_DICT:
+                    ret.append(Operator.REVERTED_DICT[type[i]])
+                elif type[i] in Punctuation.REVERTED_DICT:
+                    ret.append(Punctuation.REVERTED_DICT[type[i]])
+                else:
+                    print(type[i])
+                    raise Exception('Unknown token value')
+
+    if len(ret) == 1:
+        return ret[0]
+    else:
+        return ret

@@ -1,4 +1,4 @@
-from my_token import read_tokens_from_file, Token, Identifier, Integer, String, Float, Operator, Punctuation, Keyword, str_to_token_value, EndOfFileToken
+from my_token import read_tokens_from_file, Token, Identifier, Integer, String, Float, Operator, Punctuation, Keyword, str_to_token_value, EndOfFileToken, token_val_to_str
 from enum import Enum
 
 
@@ -69,6 +69,7 @@ class Parser():
 
     def add_debug(self, expected: str | list[str]):
         if (self.pt > self.error_pt):
+            # > and >= will print different log, but both correct log
             self.error_pt = self.pt
             self.error_str = expected
 
@@ -80,6 +81,8 @@ class Parser():
         ret = cur.token_value == type
         if (ret):
             self.pt += 1  # NOTE For simplicity, move the pointer only if matched
+        else:
+            self.add_debug(token_val_to_str(type))
         return ret
 
     def match_op(self, op_list: list[int]) -> bool:
@@ -90,6 +93,8 @@ class Parser():
         ret = any(cur.token_value == op for op in op_list)
         if (ret):
             self.pt += 1  # NOTE For simplicity, move the pointer only if matched
+        else:
+            self.add_debug(token_val_to_str(op_list))
         return ret
 
     # Recursive descent parse:
@@ -429,6 +434,8 @@ class Parser():
 
         if ret:
             self.pt += 1
+        else:
+            self.add_debug('type')
         return ret
 
     def BLOCK_ST(self) -> bool:
