@@ -46,23 +46,31 @@ class Parser():
         self.pt = pt
         self.token_list = token_list
         self.stack = ParserStack()
+        self.error_pt = 0
+        self.error_str = ''
 
-    def debug_print(self, expected: str | list[str]):
-        if (self.is_end()):
+    def print_debug(self):
+        if (self.error_pt == len(self.token_list)):
             if (len(self.token_list) >= 1):
                 print(
-                    f'Parsing Error. {self.token_list[len(self.token_list)-1]} ^ Expected: {expected}'
+                    f'Parsing Error. {self.token_list[self.error_pt-1]} ^ Expected: {self.error_str}'
                 )
             else:
                 print(f'Parsing Error. While the # of tokens is 0.')
         else:
-            cur = self.cur()
-            if (self.pt == 0):
-                print(f'Parsing Error. ^ {cur} ... Expected: {expected}')
+            if (self.error_pt == 0):
+                print(
+                    f'Parsing Error. ^ {self.token_list[self.error_pt]} ... Expected: {self.error_str}'
+                )
             else:
                 print(
-                    f'Parsing Error. {self.token_list[self.pt-1]} ^ {cur} ... Expected: {expected}'
+                    f'Parsing Error. {self.token_list[self.error_pt-1]} ^ {self.token_list[self.error_pt]} ... Expected: {self.error_str}'
                 )
+
+    def add_debug(self, expected: str | list[str]):
+        if (self.pt > self.error_pt):
+            self.error_pt = self.pt
+            self.error_str = expected
 
     def match(self, type: int) -> bool:
         if (self.is_end()):
@@ -100,7 +108,7 @@ class Parser():
             return True
 
         self.pt = tmp
-        self.debug_print('EP | MATH_EP | str')
+        self.add_debug('EP | MATH_EP | str')
 
         return False
 
@@ -110,7 +118,7 @@ class Parser():
             return True
 
         self.pt = tmp
-        self.debug_print('LOGIC_EP_B')
+        self.add_debug('LOGIC_EP_B')
 
         return False
 
@@ -129,7 +137,7 @@ class Parser():
             return True
 
         self.pt = tmp
-        self.debug_print('LOGIC_EP_C')
+        self.add_debug('LOGIC_EP_C')
 
         return False
 
@@ -152,7 +160,7 @@ class Parser():
             return True
 
         self.pt = tmp
-        self.debug_print(f'{self.OP_NOT} | LOGIC_EP_D')
+        self.add_debug(f'{self.OP_NOT} | LOGIC_EP_D')
 
         return False
 
@@ -167,7 +175,7 @@ class Parser():
             return True
 
         self.pt = tmp
-        self.debug_print('( | LOGIC_EP_E')
+        self.add_debug('( | LOGIC_EP_E')
 
         return False
 
@@ -202,7 +210,7 @@ class Parser():
             return True
 
         self.pt = tmp
-        self.debug_print('MATH_EP')
+        self.add_debug('MATH_EP')
 
         return False
 
@@ -212,7 +220,7 @@ class Parser():
             return True
 
         self.pt = tmp
-        self.debug_print('TD')
+        self.add_debug('TD')
 
         return False
 
@@ -230,7 +238,7 @@ class Parser():
             return True
 
         self.pt = tmp
-        self.debug_print('TERM')
+        self.add_debug('TERM')
 
         return False
 
@@ -261,7 +269,7 @@ class Parser():
             return True
 
         self.pt = tmp
-        self.debug_print('id | intc | real | (')
+        self.add_debug('id | intc | real | (')
 
         return False
 
@@ -277,7 +285,8 @@ class Parser():
 
     def DECLA(self) -> bool:
         if (self.is_end()):
-            print('Unexpected ending.')
+            # print('Unexpected ending.')
+            pass
         else:
             cur = self.cur()
             if (isinstance(cur, Keyword) and cur.is_type()):
@@ -286,14 +295,15 @@ class Parser():
                 if not self.VAR_LIST():
                     return False
                 if not self.match(str_to_token_value(';')):
-                    self.debug_print(';')
+                    self.add_debug(';')
                     return False
                 return True
         return False
 
     def VAR_LIST(self) -> bool:
         if (self.is_end()):
-            print('Unexpected ending')
+            # print('Unexpected ending')
+            pass
         else:
             cur = self.cur()
             if (cur.token_value == Identifier.token_value):
@@ -303,12 +313,13 @@ class Parser():
                     return False
                 return True
             else:
-                self.debug_print('id')
+                self.add_debug('id')
         return False
 
     def VAR_LIST_(self) -> bool:
         if (self.is_end()):
-            print('Unexpected ending')
+            # print('Unexpected ending')
+            pass
         else:
             cur = self.cur()
             if (cur.token_value == str_to_token_value(',')):
@@ -322,12 +333,13 @@ class Parser():
             elif (cur.token_value == str_to_token_value(';')):
                 return True
             else:
-                self.debug_print(', | ;')
+                self.add_debug(', | ;')
         return False
 
     def VAR(self) -> bool:
         if (self.is_end()):
-            print('Unexpected ending')
+            # print('Unexpected ending')
+            pass
         else:
             cur = self.cur()
             if (cur.token_value == Identifier.token_value):
@@ -338,12 +350,13 @@ class Parser():
                     return False
                 return True
             else:
-                self.debug_print('id')
+                self.add_debug('id')
         return False
 
     def VAR_(self) -> bool:
         if (self.is_end()):
-            print('Unexpected ending')
+            # print('Unexpected ending')
+            pass
         else:
             cur = self.cur()
             if (cur.token_value == str_to_token_value(',')):
@@ -364,17 +377,18 @@ class Parser():
                 if not self.match(Integer.token_value):
                     return False
                 if not self.match(str_to_token_value(']')):
-                    self.debug_print(']')
+                    self.add_debug(']')
                     return False
                 return True
             else:
-                self.debug_print(', | ; | = | [')
+                self.add_debug(', | ; | = | [')
 
         return False
 
     def INITIAL(self) -> bool:
         if (self.is_end()):
-            print('Unexpected ending')
+            # print('Unexpected ending')
+            pass
         else:
             cur = self.cur()
             if (cur.token_value == str_to_token_value(',')):
@@ -388,7 +402,7 @@ class Parser():
                     return False
                 return True
             else:
-                self.debug_print(', | ; | =')
+                self.add_debug(', | ; | =')
         return False
 
     def TYPE(self) -> bool:
@@ -433,7 +447,7 @@ class Parser():
                 if (self.match(str_to_token_value(';'))):
                     self.stack.push(';')
                 else:
-                    self.debug_print(';')
+                    self.add_debug(';')
                     return False
 
             elif self.match(Identifier.token_value):
@@ -441,7 +455,7 @@ class Parser():
                 if self.match(str_to_token_value('=')):
                     self.stack.push('=')
                 else:
-                    self.debug_print('=')
+                    self.add_debug('=')
                     return False
 
                 if self.EP():
@@ -453,7 +467,7 @@ class Parser():
                 if (self.match(str_to_token_value(';'))):
                     self.stack.push(';')
                 else:
-                    self.debug_print(';')
+                    self.add_debug(';')
                     return False
 
             elif self.match(str_to_token_value('while')):
@@ -462,7 +476,7 @@ class Parser():
                 if self.match(str_to_token_value('(')):
                     self.stack.push('(')
                 else:
-                    self.debug_print('(')
+                    self.add_debug('(')
                     return False
 
                 if self.EP():
@@ -474,13 +488,13 @@ class Parser():
                 if self.match(str_to_token_value(')')):
                     self.stack.push(')')
                 else:
-                    self.debug_print(')')
+                    self.add_debug(')')
                     return False
 
                 if self.match(str_to_token_value('{')):
                     self.stack.push('{')
                 else:
-                    self.debug_print('{')
+                    self.add_debug('{')
                     return False
 
                 if (self.BLOCK_ST()):
@@ -492,7 +506,7 @@ class Parser():
                 if (self.match(str_to_token_value('}'))):
                     self.stack.push('}')
                 else:
-                    self.debug_print('}')
+                    self.add_debug('}')
                     return False
             # Do LL(1) Top-Down here
             elif (isinstance(cur, Keyword) and cur.is_type()):
@@ -571,32 +585,32 @@ class Parser():
                 while (not self.stack.is_empty()):
                     print(self.stack.pop())
 
-                self.debug_print('BLOCK_ST')
+                self.add_debug('BLOCK_ST')
                 return False
 
         return True
 
     def IF_ST(self) -> bool:
         if not self.match(str_to_token_value('if')):
-            self.debug_print('if')
+            self.add_debug('if')
             return False
         if not self.match(str_to_token_value('(')):
-            self.debug_print('(')
+            self.add_debug('(')
             return False
         if not self.EP():
             # self.debug_print('EP')
             return False
         if not self.match(str_to_token_value(')')):
-            self.debug_print(')')
+            self.add_debug(')')
             return False
         if not self.match(str_to_token_value('{')):
-            self.debug_print('{')
+            self.add_debug('{')
             return False
         if not self.BLOCK_ST():
             # self.debug_print('BLOCK_ST')
             return False
         if not self.match(str_to_token_value('}')):
-            self.debug_print('}')
+            self.add_debug('}')
             return False
         if not self.ELSE_ST():
             # self.debug_print('ELSE_ST')
@@ -608,59 +622,59 @@ class Parser():
             return True
         else:
             if (not self.match(str_to_token_value('{'))):
-                self.debug_print('{')
+                self.add_debug('{')
                 return False
             if (not self.BLOCK_ST()):
                 # self.debug_print('BLOCK_ST')
                 return False
             if (not self.match(str_to_token_value('}'))):
-                self.debug_print('}')
+                self.add_debug('}')
                 return False
             return True
         return True
 
     def FOR_ST(self) -> bool:
         if not self.match(str_to_token_value('for')):
-            self.debug_print('for')
+            self.add_debug('for')
             return False
         if not self.match(str_to_token_value('(')):
-            self.debug_print('(')
+            self.add_debug('(')
             return False
         if not self.VAR():
             # self.debug_print('VAR')
             return False
         if not self.match(str_to_token_value(';')):
-            self.debug_print(';')
+            self.add_debug(';')
             return False
         if not self.EP():
             # self.debug_print('EP')
             return False
         if not self.match(str_to_token_value(';')):
-            self.debug_print(';')
+            self.add_debug(';')
             return False
         if not self.ASS_ST():
             # self.debug_print('ASS_ST')
             return False
         if not self.match(str_to_token_value(')')):
-            self.debug_print(')')
+            self.add_debug(')')
             return False
         if not self.match(str_to_token_value('{')):
-            self.debug_print('{')
+            self.add_debug('{')
             return False
         if not self.BLOCK_ST():
             # self.debug_print('BLOCK_ST')
             return False
         if not self.match(str_to_token_value('}')):
-            self.debug_print('}')
+            self.add_debug('}')
             return False
         return True
 
     def ASS_ST(self) -> bool:
         if not self.match(Identifier.token_value):
-            self.debug_print('id')
+            self.add_debug('id')
             return False
         if not self.match(str_to_token_value('=')):
-            self.debug_print('=')
+            self.add_debug('=')
             return False
         if not self.EP():
             return False
@@ -669,11 +683,13 @@ class Parser():
     # LAST PART
     def START(self) -> bool:
         tmp = self.pt
-        if (self.EX_DECLA() and self.START_()):
+        if (self.EX_DECLA() and self.START_() and self.is_end()):
             return True
 
         self.pt = tmp
-        self.debug_print('EX_DECLA')
+        self.add_debug('EX_DECLA')
+
+        self.print_debug()
         return False
 
     def START_(self) -> bool:
@@ -694,7 +710,7 @@ class Parser():
             return True
 
         self.pt = tmp
-        self.debug_print('DECLA | FUNC_DEF')
+        self.add_debug('DECLA | FUNC_DEF')
 
         return False
 
@@ -708,7 +724,7 @@ class Parser():
             return True
 
         self.pt = tmp
-        self.debug_print('TYPE')
+        self.add_debug('TYPE')
 
         return False
 
