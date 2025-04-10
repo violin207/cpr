@@ -1,0 +1,19 @@
+int main() {
+    if (x == 20) {
+        if (y == 2){
+            int b = 6;
+        }
+        int k = 7;
+    }
+    else{
+        if (z == 30){
+            (k == 20){
+                a = 2;
+            }
+            else{
+                int a = 3;
+            }
+            int c = 20;
+        }
+    }
+}

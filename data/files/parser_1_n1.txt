@@ -1,8 +1,11 @@
+int  main ()
+{
    int   x=1, y=2,z;
    if(x<=y){
         z=x;
-     }
-   char ch[10]="abc";
-   for(x=0;x<10;x++){
-        ch[x]=ch[x]+z;
    }
+   float f = 0;
+   for(x=0;x<10;x++){
+     f = f + x;
+   }
+}

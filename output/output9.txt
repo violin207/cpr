@@ -1,1 +1,0 @@
-<'int', keyword>, <'x', identifier>, <'=', operator>, <'1', int>, <',', punctuation>, <'y', identifier>, <'=', operator>, <'2', int>, <',', punctuation>, <'z', identifier>, <';', punctuation>
