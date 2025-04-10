@@ -93,16 +93,21 @@ def handle_string(f: TextIOWrapper, start: str):
 def parse(s):
     parser = argparse.ArgumentParser(s)
     parser.add_argument('-i', '--input_file', default='input.txt')
-    parser.add_argument('-o', '--output_file', default='output.txt')
+    parser.add_argument('-o', '--output_file', default=None)
 
     parsed_args = parser.parse_args()
-    return parsed_args.input_file, parsed_args.output_file
+    input_file = parsed_args.input_file
+    output_file = parsed_args.output_file
+    if output_file is None:
+        output_file = f'{input_file}.out'
+    
+    return input_file, output_file
 
 
 if __name__ == '__main__':
     input_filename, output_filename = parse(sys.argv[0])
 
-    with open(Path('input', input_filename), 'r') as f:
+    with open(Path('data', 'files', input_filename), 'r') as f:
         tokens: list[Token] = list()
 
         char = f.read(1)
@@ -122,5 +127,5 @@ if __name__ == '__main__':
                 token, char = handle_operator_and_punctutation(f, char)
                 tokens.append(token)
 
-    with open(Path('output', output_filename), 'w') as f:
+    with open(Path('data', 'lex_out', output_filename), 'w') as f:
         f.write(', '.join(map(str, tokens)))

@@ -1,6 +1,8 @@
 from my_token import read_tokens_from_file, Token, Identifier, Integer, String, Float, Operator, Punctuation, Keyword, str_to_token_value, EndOfFileToken, token_val_to_str
 from enum import Enum
-
+from pathlib import Path
+import argparse
+import sys
 
 class STATE(Enum):
     START = 1
@@ -737,31 +739,43 @@ class Parser():
 
 
 if __name__ == '__main__':
-    from pathlib import Path
+    def parse(s):
+        parser = argparse.ArgumentParser(s)
+        parser.add_argument('-n', '--name', default='input.txt')
 
-    def func1():
-        tokens = read_tokens_from_file(Path('output', 'output7.txt'))
-        parser = Parser(0, tokens)
-        print(parser.DECLA(), parser.pt)
+        parsed_args = parser.parse_args()
+        return parsed_args.name
+    name = parse(sys.argv[0])
+    tokens = read_tokens_from_file(Path('data', 'lex_out', f'{name}.out'))
+    parser = Parser(0, tokens)
+    print(parser.START())
 
-    def func2():
-        tokens = read_tokens_from_file(Path('output', 'output8.txt'))
-        parser = Parser(0, tokens)
-        print(parser.BLOCK_ST())
 
-    def func3():
-        tokens = read_tokens_from_file(Path('output', 'output9.txt'))
-        parser = Parser(0, tokens)
-        print(parser.DECLA())
 
-    def func4():
-        tokens = read_tokens_from_file(Path('output', 'output11.txt'))
-        parser = Parser(0, tokens)
-        print(parser.BLOCK_ST())
 
-    def func5():
-        tokens = read_tokens_from_file(Path('output', 'output.txt'))
-        parser = Parser(0, tokens)
-        print(parser.START())
+    # def func1():
+    #     tokens = read_tokens_from_file(Path('output', 'output7.txt'))
+    #     parser = Parser(0, tokens)
+    #     print(parser.DECLA(), parser.pt)
 
-    func5()
+    # def func2():
+    #     tokens = read_tokens_from_file(Path('output', 'output8.txt'))
+    #     parser = Parser(0, tokens)
+    #     print(parser.BLOCK_ST())
+
+    # def func3():
+    #     tokens = read_tokens_from_file(Path('output', 'output9.txt'))
+    #     parser = Parser(0, tokens)
+    #     print(parser.DECLA())
+
+    # def func4():
+    #     tokens = read_tokens_from_file(Path('output', 'output11.txt'))
+    #     parser = Parser(0, tokens)
+    #     print(parser.BLOCK_ST())
+
+    # def func5():
+    #     tokens = read_tokens_from_file(Path('output', 'output.txt'))
+    #     parser = Parser(0, tokens)
+    #     print(parser.START())
+
+    # func5()
